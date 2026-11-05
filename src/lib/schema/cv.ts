@@ -50,9 +50,13 @@ export const personalSchema = z.object({
 })
 
 export const SECTOR_IDS = ['tech', 'creative', 'health', 'legal', 'education', 'hospitality', 'engineering', 'business'] as const
-export const CV_LAYOUTS = ['auto', 'sidebar', 'classic', 'compact'] as const
+export const CV_LAYOUTS = ['auto', 'sidebar', 'classic', 'compact', 'editorial', 'impact'] as const
+export const PORTFOLIO_TEMPLATES = ['stage', 'film', 'cosmos'] as const
+/** Plantillas que requieren el plan Premium */
+export const PREMIUM_LAYOUTS: readonly string[] = ['editorial', 'impact']
+export const PREMIUM_TEMPLATES: readonly string[] = ['film', 'cosmos']
 
-export const HEADING_FONTS = ['auto', 'bricolage', 'fraunces', 'playfair', 'space', 'outfit', 'montserrat', 'syne'] as const
+export const HEADING_FONTS = ['auto', 'bricolage', 'fraunces', 'playfair', 'space', 'outfit', 'montserrat', 'syne', 'lexend'] as const
 export const BODY_FONTS = ['geist', 'inter', 'plex', 'nunito', 'lora', 'sourceserif'] as const
 export const SHAPES = ['auto', 'core', 'knot', 'helix', 'columns', 'rings', 'blocks', 'bars'] as const
 
@@ -152,9 +156,34 @@ export const contactMessageSchema = z.object({
 })
 export type ContactMessage = z.infer<typeof contactMessageSchema>
 
+export const PHOTO_SHAPES = ['circle', 'rounded', 'square'] as const
+export const PHOTO_PORTFOLIO = ['frame', 'avatar', 'none'] as const
+
+export const photoSchema = z.object({
+  /** mostrar la foto en el CV */
+  cv: z.boolean(),
+  cvShape: z.enum(PHOTO_SHAPES),
+  /** frame: marco 3D flotante · avatar: círculo pequeño · none: sin foto */
+  portfolio: z.enum(PHOTO_PORTFOLIO),
+})
+
+export const defaultPhoto: z.infer<typeof photoSchema> = { cv: true, cvShape: 'circle', portfolio: 'frame' }
+
+/** Nombres propios de los apartados ('' = el del sector). La importación con IA los adapta a la profesión. */
+export const labelOverridesSchema = z.object({
+  skills: z.string(),
+  experience: z.string(),
+  education: z.string(),
+  projects: z.string(),
+  contact: z.string(),
+})
+export const defaultLabelOverrides: z.infer<typeof labelOverridesSchema> = { skills: '', experience: '', education: '', projects: '', contact: '' }
+
 export const settingsSchema = z.object({
   sector: z.enum(SECTOR_IDS),
   cvLayout: z.enum(CV_LAYOUTS),
+  /** stage: escenario 3D (gratis) · film y cosmos: Premium */
+  portfolioTemplate: z.enum(PORTFOLIO_TEMPLATES),
   /** '' = color del sector */
   accent: z.string(),
   /** '' = fondo del sector */
@@ -169,6 +198,8 @@ export const settingsSchema = z.object({
   effects: effectsSchema,
   skillsView: skillsViewSchema,
   contact: contactSchema,
+  photo: photoSchema,
+  labels: labelOverridesSchema,
 })
 
 export const defaultStyle = {
@@ -196,8 +227,11 @@ export type Settings = CV['settings']
 export type Effects = CV['settings']['effects']
 export type SkillsView = CV['settings']['skillsView']
 export type ContactSettings = CV['settings']['contact']
+export type PhotoSettings = CV['settings']['photo']
+export type LabelOverrides = CV['settings']['labels']
 export type SectorId = (typeof SECTOR_IDS)[number]
 export type CVLayout = Exclude<(typeof CV_LAYOUTS)[number], 'auto'>
+export type PortfolioTemplate = (typeof PORTFOLIO_TEMPLATES)[number]
 export type HeadingFont = Exclude<(typeof HEADING_FONTS)[number], 'auto'>
 export type BodyFont = (typeof BODY_FONTS)[number]
 export type Skill = CV['skills'][number]
@@ -207,7 +241,7 @@ export type Project = CV['projects'][number]
 export type ListSection = 'skills' | 'experience' | 'education' | 'projects'
 
 export const emptyCV: CV = {
-  settings: { sector: 'tech', cvLayout: 'auto', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact },
+  settings: { sector: 'tech', cvLayout: 'auto', portfolioTemplate: 'stage', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact, photo: defaultPhoto, labels: defaultLabelOverrides },
   personal: {
     fullName: '',
     headline: '',

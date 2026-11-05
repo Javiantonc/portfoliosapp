@@ -1,7 +1,7 @@
 'use client'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Box, Briefcase, Check, FileText, FolderKanban, GraduationCap, Layers, Mail, Maximize2, Paintbrush, Zap, Sparkles, User } from 'lucide-react'
+import { Box, Briefcase, Check, Crown, Eye, FileText, FileUp, FolderKanban, GraduationCap, Layers, Mail, Maximize2, Paintbrush, PenLine, Zap, Sparkles, User } from 'lucide-react'
 import { useCVStore, useSector } from '@/lib/store/cv-store'
 import { type SectorLabels } from '@/lib/sectors'
 import { styleVars } from '@/lib/design'
@@ -21,9 +21,10 @@ import { ProjectsForm } from './components/ProjectsForm'
 import { SectorForm } from './components/SectorForm'
 import { StyleForm } from './components/StyleForm'
 import { EffectsForm } from './components/EffectsForm'
+import { PortfolioRenderer } from '@/features/portfolio-premium/PortfolioRenderer'
+import { usePremium } from '@/features/premium/premium'
 import { ContactSettingsForm } from './components/ContactSettingsForm'
 
-const PortfolioCanvas = lazy(() => import('@/features/portfolio-3d/PortfolioCanvas'))
 
 type SectionId = 'sector' | 'style' | 'effects' | 'contact' | 'personal' | 'skills' | 'experience' | 'education' | 'projects'
 
@@ -62,7 +63,7 @@ function Preview({ cv }: { cv: CV }) {
       className="relative flex h-full flex-col overflow-hidden rounded-[28px]"
       style={{ ...styleVars(style), background: style.theme.bg }}
     >
-      <div className="stage absolute inset-x-0 top-0 z-20 flex items-center justify-between p-3">
+      <div className="stage absolute inset-x-0 top-0 z-40 flex items-center justify-between p-3">
         <div role="tablist" aria-label="Tipo de vista previa" className="flex rounded-full bg-[color-mix(in_srgb,var(--st-bg)_80%,transparent)] p-1 backdrop-blur-md">
           {([
             ['3d', 'Portfolio 3D', Box],
@@ -74,11 +75,11 @@ function Preview({ cv }: { cv: CV }) {
               aria-selected={mode === id}
               onClick={() => setMode(id)}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors',
+                'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap transition-colors',
                 mode === id ? 'bg-[var(--st-text)] text-[var(--st-bg)]' : 'text-[var(--st-soft)] hover:text-[var(--st-text)]'
               )}
             >
-              <Icon className="size-4" /> {label}
+              <Icon className="size-4" /> <span className="max-[359px]:sr-only">{label}</span>
             </button>
           ))}
         </div>
@@ -86,13 +87,13 @@ function Preview({ cv }: { cv: CV }) {
           to={mode === '3d' ? 'portfolio' : 'cv'}
           className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--st-bg)_80%,transparent)] px-3.5 py-2 text-sm text-[var(--st-text)] backdrop-blur-md transition-colors hover:bg-[var(--st-bg)]"
         >
-          <Maximize2 className="size-4" /> Pantalla completa
+          <Maximize2 className="size-4" /> <span className="max-sm:sr-only">Pantalla completa</span>
         </AppLink>
       </div>
       <div className="relative min-h-0 flex-1">
         {mode === '3d' ? (
           <Suspense fallback={<div className="grid h-full place-items-center text-sm text-[var(--st-mist)]">Cargando escena 3D…</div>}>
-            <PortfolioCanvas data={cv} />
+            <PortfolioRenderer cv={cv} embedded />
           </Suspense>
         ) : (
           <div className="scrollbar-thin h-full overflow-y-auto bg-[#e7e9f4] pt-14">
@@ -110,8 +111,11 @@ export function EditorShell() {
   const cv = useCVStore((s) => s.cv)
   const rev = useCVStore((s) => s.rev)
   const loadDemo = useCVStore((s) => s.loadDemo)
+  const openImport = useCVStore((s) => s.setImportOpen)
+  const { canCv, canPortfolio, openUpgrade } = usePremium()
   const sector = useSector()
   const [active, setActive] = useState<SectionId>('sector')
+  const [mobileView, setMobileView] = useState<'form' | 'preview'>('form')
   const current = sections.find((s) => s.id === active)!
   const Form = current.Form
   const doneCount = sections.filter((s) => s.done(cv)).length
@@ -122,6 +126,12 @@ export function EditorShell() {
         current="editor"
         actions={
           <>
+            <Button size="sm" variant="ghost" onClick={openUpgrade} className={canPortfolio ? 'text-[#8a6100]' : ''}>
+              <Crown className="size-4" /> {canCv ? 'Premium activo' : canPortfolio ? 'Portfolio Premium' : 'Premium · desde 1 €'}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => openImport(true)}>
+              <FileUp className="size-4" /> Importar CV
+            </Button>
             <Button size="sm" variant="ghost" onClick={() => loadDemo()}>
               Cargar ejemplo
             </Button>
@@ -131,7 +141,12 @@ export function EditorShell() {
       />
 
       <div className="flex min-h-0 flex-1 gap-4 p-3 sm:p-4">
-        <div className="flex min-h-0 w-full flex-col overflow-hidden rounded-[28px] border border-line bg-white/60 lg:w-[min(640px,48%)] xl:flex-row">
+        <div
+          className={cn(
+            'min-h-0 w-full flex-col overflow-hidden rounded-[28px] border border-line bg-white/60 lg:flex lg:w-[min(640px,48%)] xl:flex-row',
+            mobileView === 'form' ? 'flex' : 'hidden'
+          )}
+        >
           <nav aria-label="Apartados del CV" className="shrink-0 border-b border-line p-3 xl:w-56 xl:border-r xl:border-b-0 xl:p-4">
             <p className="mb-3 hidden px-2 text-xs text-ink-soft xl:block">
               {doneCount} de {sections.length} apartados listos
@@ -171,21 +186,42 @@ export function EditorShell() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -12 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="p-5 sm:p-7"
+                className="p-5 pb-28 sm:p-7 lg:pb-7"
               >
                 <Form />
               </motion.div>
             </AnimatePresence>
-            <div className="flex flex-col gap-2 border-t border-line p-5 sm:hidden">
-              <AppLink to="portfolio" className="text-sm font-medium text-violet">Ver mi portfolio 3D</AppLink>
-              <AppLink to="cv" className="text-sm font-medium text-violet">Ver mi CV</AppLink>
-            </div>
           </div>
         </div>
 
-        <div className="hidden min-w-0 flex-1 lg:block">
+        <div className={cn('min-w-0 flex-1 pb-20 lg:block lg:pb-0', mobileView === 'preview' ? 'block' : 'hidden')}>
           <Preview cv={cv} />
         </div>
+      </div>
+
+      <div
+        role="tablist"
+        aria-label="Vista en móvil"
+        className="fixed bottom-3 left-1/2 z-40 flex -translate-x-1/2 rounded-full border border-line bg-white/90 p-1 shadow-[0_12px_30px_-12px_rgb(21_23_58/0.45)] backdrop-blur-md lg:hidden"
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {([
+          ['form', 'Editar', PenLine],
+          ['preview', 'Vista previa', Eye],
+        ] as const).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={mobileView === id}
+            onClick={() => setMobileView(id)}
+            className={cn(
+              'inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-medium whitespace-nowrap transition-colors',
+              mobileView === id ? 'bg-ink text-white' : 'text-ink-soft'
+            )}
+          >
+            <Icon className="size-4" /> <span className="max-[359px]:sr-only">{label}</span>
+          </button>
+        ))}
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import type { CVLayout, HeadingFont, SectorId } from './schema/cv'
+import type { CV, CVLayout, HeadingFont, LabelOverrides, SectorId } from './schema/cv'
 
 export type HeroShape = 'core' | 'knot' | 'helix' | 'columns' | 'rings' | 'blocks' | 'bars'
 
@@ -152,3 +152,19 @@ export const getSector = (id: SectorId | undefined) => sectors[id ?? 'tech'] ?? 
 export const resolveLayout = (sector: Sector, layout: string): CVLayout =>
   layout === 'auto' ? sector.cvLayout : (layout as CVLayout)
 
+
+/** Aplica los nombres de apartados personalizados sobre los del sector. */
+export function mergeLabels(base: SectorLabels, o?: Partial<LabelOverrides>): SectorLabels {
+  if (!o) return base
+  const pick = (v: string | undefined, d: string) => (v && v.trim() ? v.trim() : d)
+  return {
+    ...base,
+    skills: pick(o.skills, base.skills),
+    experience: pick(o.experience, base.experience),
+    education: pick(o.education, base.education),
+    projects: pick(o.projects, base.projects),
+    contact: pick(o.contact, base.contact),
+  }
+}
+
+export const getLabels = (cv: CV) => mergeLabels(getSector(cv.settings?.sector).labels, cv.settings?.labels)

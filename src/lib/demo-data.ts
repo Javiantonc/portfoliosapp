@@ -1,7 +1,7 @@
-import { defaultContact, defaultEffects, defaultSkillsView, defaultStyle, type CV, type SectorId } from './schema/cv'
+import { defaultContact, defaultLabelOverrides, defaultPhoto, defaultEffects, defaultSkillsView, defaultStyle, type CV, type SectorId } from './schema/cv'
 
 const techCV: CV = {
-  settings: { sector: 'tech', cvLayout: 'auto', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact },
+  settings: { sector: 'tech', cvLayout: 'auto', portfolioTemplate: 'stage', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact, photo: defaultPhoto, labels: defaultLabelOverrides },
   personal: {
     fullName: 'Lucía Ferrer',
     headline: 'Diseñadora de producto y desarrolladora frontend',
@@ -118,7 +118,7 @@ type Lite = {
 
 function build(sector: SectorId, d: Lite): CV {
   return {
-    settings: { sector, cvLayout: 'auto', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact },
+    settings: { sector, cvLayout: 'auto', portfolioTemplate: 'stage', ...defaultStyle, effects: defaultEffects, skillsView: defaultSkillsView, contact: defaultContact, photo: defaultPhoto, labels: defaultLabelOverrides },
     personal: {
       fullName: d.name,
       headline: d.headline,

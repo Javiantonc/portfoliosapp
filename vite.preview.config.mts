@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 // Vista previa estática (sin servidor) de la app: npm run preview:build
 export default defineConfig({
   root: 'preview',
+  publicDir: '../public',
   base: './',
   plugins: [react(), tailwindcss()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },

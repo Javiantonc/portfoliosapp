@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { CV } from '@/lib/schema/cv'
-import { getSector, resolveLayout, type SectorLabels } from '@/lib/sectors'
+import { getLabels, getSector, resolveLayout, type SectorLabels } from '@/lib/sectors'
 import { headingFonts, resolveStyle } from '@/lib/design'
+import { Editorial, Impact } from './PremiumLayouts'
 import { formatRange, initials } from '@/lib/utils'
 
 const SHEET: CSSProperties = { width: '210mm', minHeight: '297mm', fontSize: '10pt', lineHeight: 1.5 }
@@ -13,10 +14,14 @@ function H({ children, className = '' }: { children: ReactNode; className?: stri
   return <h2 className={`mb-3 font-display text-[13px] font-bold text-[var(--cv-accent)] ${className}`}>{children}</h2>
 }
 
+const shapeClass = { circle: 'rounded-full', rounded: 'rounded-[18%]', square: 'rounded-none' } as const
+
 function Photo({ data, size, className = '' }: { data: CV; size: string; className?: string }) {
   const p = data.personal
+  const ph = data.settings.photo
+  if (!ph?.cv) return null
   return (
-    <div className={`shrink-0 overflow-hidden rounded-full bg-[#e2e4f3] ${className}`} style={{ width: size, height: size }}>
+    <div className={`shrink-0 overflow-hidden bg-[#e2e4f3] ${shapeClass[ph.cvShape] ?? 'rounded-full'} ${className}`} style={{ width: size, height: size }}>
       {p.photoUrl ? (
         <img src={p.photoUrl} alt="" className="size-full object-cover" />
       ) : (
@@ -289,8 +294,9 @@ export function CVDocument({ data }: { data: CV }) {
   const sector = getSector(data.settings?.sector)
   const layout = resolveLayout(sector, data.settings?.cvLayout ?? 'auto')
   const st = resolveStyle(data)
-  const L = sector.labels
-  const heading = data.settings.headingFont === 'auto' && layout === 'classic' ? headingFonts.fraunces.family : st.headingFamily
+  const L = getLabels(data)
+  const auto = data.settings.headingFont === 'auto'
+  const heading = auto && layout === 'classic' ? headingFonts.fraunces.family : auto && (layout === 'editorial' || layout === 'impact') ? headingFonts.lexend.family : st.headingFamily
   const z = st.textScale
   const style = {
     ...SHEET,
@@ -302,7 +308,17 @@ export function CVDocument({ data }: { data: CV }) {
   return (
     <article className={sheetClass} style={style}>
       <div className="flex" style={{ zoom: z, width: `calc(210mm / ${z})`, minHeight: `calc(297mm / ${z})` }}>
-        {layout === 'classic' ? <Classic data={data} L={L} /> : layout === 'compact' ? <Compact data={data} L={L} /> : <Sidebar data={data} L={L} />}
+        {layout === 'classic' ? (
+          <Classic data={data} L={L} />
+        ) : layout === 'compact' ? (
+          <Compact data={data} L={L} />
+        ) : layout === 'editorial' ? (
+          <Editorial data={data} L={L} />
+        ) : layout === 'impact' ? (
+          <Impact data={data} L={L} />
+        ) : (
+          <Sidebar data={data} L={L} />
+        )}
       </div>
     </article>
   )

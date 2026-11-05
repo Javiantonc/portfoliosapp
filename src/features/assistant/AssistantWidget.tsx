@@ -131,7 +131,7 @@ export function AssistantWidget() {
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformOrigin: 'bottom right' }}
-            className="fixed right-3 bottom-20 z-50 flex h-[min(600px,calc(100dvh-7rem))] w-[min(400px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[26px] border border-line bg-white text-ink shadow-[0_30px_80px_-20px_rgb(21_23_58/0.45)] sm:right-5"
+            className="fixed inset-x-2 top-2 bottom-[4.75rem] z-50 flex flex-col overflow-hidden rounded-[26px] border border-line bg-white text-ink shadow-[0_30px_80px_-20px_rgb(21_23_58/0.45)] sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-20 sm:h-[min(600px,calc(100dvh-7rem))] sm:w-[400px]"
           >
             <header className="flex items-center gap-3 border-b border-line px-4 py-3.5">
               <LogoMark className="size-8 text-ink" />
@@ -252,10 +252,11 @@ export function AssistantWidget() {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label={open ? 'Cerrar asistente' : 'Abrir asistente de ayuda'}
-        className="fixed right-3 bottom-3 z-50 inline-flex h-12 items-center gap-2 rounded-full bg-ink pr-5 pl-4 text-sm font-medium text-white shadow-[0_12px_30px_-10px_rgb(21_23_58/0.6)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] sm:right-5 sm:bottom-5"
+        className="fixed right-3 bottom-3 z-50 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-3.5 text-sm font-medium text-white shadow-[0_12px_30px_-10px_rgb(21_23_58/0.6)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] sm:right-5 sm:bottom-5 sm:pr-5 sm:pl-4"
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
       >
         {open ? <X className="size-5" /> : <MessageCircle className="size-5" />}
-        {open ? 'Cerrar' : '¿Dudas?'}
+        <span className="max-sm:sr-only">{open ? 'Cerrar' : '¿Dudas?'}</span>
       </button>
     </div>
   )

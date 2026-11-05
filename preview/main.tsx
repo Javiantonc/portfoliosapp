@@ -9,6 +9,9 @@ import { PortfolioView } from '@/features/portfolio-3d/PortfolioView'
 import { AssistantWidget } from '@/features/assistant/AssistantWidget'
 import { askViaSample } from './sample-transport'
 import { sendContactPreview } from './contact-transport'
+import { importCvViaSample } from './import-transport'
+import { ImportCvDialog } from '@/features/cv-import/ImportCvDialog'
+import { UpgradeDialog } from '@/features/premium/premium'
 
 const views: View[] = ['home', 'editor', 'cv', 'portfolio']
 const read = (): View => {
@@ -28,12 +31,14 @@ function App() {
     return () => window.removeEventListener('hashchange', on)
   }, [])
   return (
-    <AppEnvProvider value={{ Link, isPreview: true, ask: askViaSample, sendContact: sendContactPreview }}>
+    <AppEnvProvider value={{ Link, isPreview: true, ask: askViaSample, sendContact: sendContactPreview, importCv: importCvViaSample, navigate: (v) => (location.hash = v), assetBase: './' }}>
       {view === 'home' && <Landing />}
       {view === 'editor' && <EditorShell />}
       {view === 'cv' && <CVView />}
       {view === 'portfolio' && <PortfolioView />}
       <AssistantWidget />
+      <ImportCvDialog />
+      <UpgradeDialog />
     </AppEnvProvider>
   )
 }

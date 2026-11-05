@@ -14,7 +14,7 @@ const variants: Record<Variant, string> = {
 export function buttonClass(variant: Variant = 'primary', size: 'sm' | 'md' = 'md') {
   return cn(
     'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-[background,border,color,transform] active:scale-[0.98] disabled:opacity-50',
-    size === 'sm' ? 'h-8 px-3.5 text-sm' : 'h-11 px-5 text-[15px]',
+    size === 'sm' ? 'h-10 px-3.5 text-sm sm:h-8' : 'h-11 px-5 text-[15px]',
     variants[variant]
   )
 }
@@ -34,7 +34,7 @@ export function IconButton({ label, className, ...rest }: ButtonHTMLAttributes<H
       type="button"
       aria-label={label}
       title={label}
-      className={cn('grid size-8 place-items-center rounded-full text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-30', className)}
+      className={cn('grid size-10 place-items-center rounded-full sm:size-8 text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-30', className)}
       {...rest}
     />
   )
@@ -96,11 +96,11 @@ export function LogoMark({ className }: { className?: string }) {
   )
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
     <span className={cn('inline-flex items-center gap-2 font-display text-[21px] leading-none font-extrabold tracking-[-0.035em]', className)}>
       <LogoMark className="size-7" />
-      relieve
+      <span className={compact ? 'max-[419px]:sr-only' : undefined}>relieve</span>
     </span>
   )
 }

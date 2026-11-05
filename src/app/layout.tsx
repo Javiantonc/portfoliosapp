@@ -15,7 +15,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Fraunces:opsz,wght@9..144,400..800&family=Geist:wght@400..700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Fraunces:opsz,wght@9..144,400..800&family=Lexend:wght@300..800&family=JetBrains+Mono:wght@400;500&family=Geist+Mono:wght@400;500&family=Geist:wght@400..700&display=swap"
         />
       </head>
       <body>

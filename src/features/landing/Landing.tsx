@@ -7,6 +7,10 @@ import { sectorList } from '@/lib/sectors'
 import type { SectorId } from '@/lib/schema/cv'
 import { sectorIcons } from '@/features/cv-editor/components/SectorForm'
 import { cn } from '@/lib/utils'
+import { useIsTouch } from '@/lib/use-touch'
+import { useCVStore } from '@/lib/store/cv-store'
+import { FileUp } from 'lucide-react'
+import { PremiumShowcase } from '@/features/premium/PremiumShowcase'
 import { buttonClass, Logo } from '@/components/ui'
 
 const PortfolioCanvas = lazy(() => import('@/features/portfolio-3d/PortfolioCanvas'))
@@ -24,6 +28,8 @@ const useMounted = () => useSyncExternalStore(noop, () => true, () => false)
 
 export function Landing() {
   const mounted = useMounted()
+  const touch = useIsTouch()
+  const openImport = useCVStore((s) => s.setImportOpen)
   const [sector, setSector] = useState<SectorId>('health')
   const reduce = useReducedMotion()
   const rise = (delay: number) =>
@@ -51,15 +57,18 @@ export function Landing() {
               <AppLink to="editor" className={buttonClass('primary')}>
                 Crear mi CV gratis
               </AppLink>
-              <AppLink to="portfolio" className={buttonClass('secondary')}>
-                Ver un portfolio de ejemplo
+              <button type="button" onClick={() => openImport(true)} className={buttonClass('secondary')}>
+                <FileUp className="size-4" /> Ya tengo CV: crear mi portfolio
+              </button>
+              <AppLink to="portfolio" className={buttonClass('ghost')}>
+                Ver un ejemplo
               </AppLink>
             </motion.div>
           </div>
 
         </div>
 
-        <div className="relative min-h-[70svh] overflow-hidden lg:m-3 lg:min-h-0 lg:rounded-[32px]">
+        <div className="relative min-h-[85svh] overflow-hidden lg:m-3 lg:min-h-0 lg:rounded-[32px]">
           <div className="absolute inset-0 bg-[#121433]">
             {mounted && (
               <Suspense fallback={null}>
@@ -70,7 +79,7 @@ export function Landing() {
           <div className="grain absolute inset-0" />
           <div className="stage absolute inset-x-0 top-0 p-4 sm:p-5">
             <p className="mb-2.5 px-1 text-sm text-white/70">Prueba otro sector</p>
-            <div role="radiogroup" aria-label="Sector de ejemplo" className="flex flex-wrap gap-1.5">
+            <div role="radiogroup" aria-label="Sector de ejemplo" className="scrollbar-none -mx-4 flex gap-1.5 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {sectorList.map((s) => {
                 const Icon = sectorIcons[s.id]
                 const on = s.id === sector
@@ -81,7 +90,7 @@ export function Landing() {
                     aria-checked={on}
                     onClick={() => setSector(s.id)}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium backdrop-blur-md transition-colors',
+                      'inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium backdrop-blur-md transition-colors sm:py-1.5',
                       on ? 'bg-white text-[#15173a]' : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white'
                     )}
                   >
@@ -92,7 +101,7 @@ export function Landing() {
             </div>
           </div>
           <p className="stage pointer-events-none absolute bottom-5 left-6 text-sm text-white/65">
-            CV de ejemplo: {sectorDemos[sector].personal.headline.toLowerCase()}. Mueve el ratón.
+            CV de ejemplo: {sectorDemos[sector].personal.headline.toLowerCase()}.{touch ? '' : ' Mueve el ratón.'}
           </p>
         </div>
       </section>
@@ -111,6 +120,8 @@ export function Landing() {
           </ol>
         </div>
       </section>
+
+      <PremiumShowcase />
 
       <section className="px-3 pb-3">
         <div className="stage relative overflow-hidden rounded-[32px] bg-[#121433] px-6 py-20 text-[#eceaff] sm:px-10 lg:py-28">

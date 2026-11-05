@@ -10,6 +10,7 @@ export const headingFonts: Record<HeadingFont, FontDef & { serif: boolean; typef
   space: { label: 'Space Grotesk', family: '"Space Grotesk", sans-serif', google: 'Space+Grotesk:wght@400..700', serif: false, typeface: () => import('@/assets/space-grotesk-bold.typeface.json') },
   outfit: { label: 'Outfit', family: '"Outfit", sans-serif', google: 'Outfit:wght@300..800', serif: false, typeface: () => import('@/assets/outfit-bold.typeface.json') },
   montserrat: { label: 'Montserrat', family: '"Montserrat", sans-serif', google: 'Montserrat:wght@400..800', serif: false, typeface: () => import('@/assets/montserrat-bold.typeface.json') },
+  lexend: { label: 'Lexend', family: '"Lexend", sans-serif', google: 'Lexend:wght@300..800', serif: false, typeface: () => import('@/assets/lexend-bold.typeface.json') },
   syne: { label: 'Syne', family: '"Syne", sans-serif', google: 'Syne:wght@400..800', serif: false, typeface: () => import('@/assets/syne-bold.typeface.json') },
 }
 

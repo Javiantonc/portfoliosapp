@@ -105,3 +105,42 @@ Para varios servidores, cambia el límite en memoria por uno compartido (por eje
 
 **Opción B — «Abrir el correo del visitante».** No necesita servidor: se abre el programa de correo del visitante
 (`mailto:`) con el mensaje preparado. Es menos fiable porque depende de que el visitante tenga uno configurado.
+
+## Importar un CV existente
+
+Desde la portada («Ya tengo CV: crear mi portfolio») o el editor («Importar CV»). El navegador extrae el texto del
+archivo (PDF con pdf.js, Word con mammoth, TXT; las fotos y los PDF escaneados se envían como imagen) y
+`src/app/api/import-cv/route.ts` lo convierte en los datos del editor con la API de Anthropic
+(`ANTHROPIC_API_KEY`; modelo configurable con `IMPORT_MODEL`, por defecto `claude-sonnet-5-5`).
+Las instrucciones están en `src/lib/import/prompt.ts` y la limpieza de datos en `src/lib/import/normalize.ts`.
+
+El worker de pdf.js se copia a `public/pdf.worker.min.js` al ejecutar `npm install` (script `postinstall`).
+
+## Relieve Premium
+
+- CV: plantillas **Editorial** y **Impacto** (`src/features/cv-document/PremiumLayouts.tsx`).
+- Portfolio: plantillas **Cine** y **Cosmos** (`src/features/portfolio-premium/`).
+- Escaparate en la portada y diálogo Premium con ejemplos reales (`src/features/premium/`).
+
+Las plantillas Premium se pueden probar gratis en la vista previa. Para descargarlas o publicarlas hay dos compras
+de **pago único** (`src/lib/pricing.ts`):
+
+| Producto | Precio | Incluye |
+| --- | --- | --- |
+| CV + Portfolio Premium (`bundle`) | 1,99 € | CV Editorial e Impacto + portfolios Cine y Cosmos |
+| Portfolio Premium (`portfolio`) | 1 € | Solo los portfolios Cine y Cosmos |
+
+### Pagos con Stripe
+
+1. Crea una cuenta en [Stripe](https://dashboard.stripe.com) y copia la clave secreta en `STRIPE_SECRET_KEY`.
+2. Opcional: `NEXT_PUBLIC_SITE_URL` (URL pública, para las páginas de vuelta del pago).
+3. Webhook: en Stripe, añade el endpoint `https://TU-DOMINIO/api/stripe/webhook` con el evento
+   `checkout.session.completed` y guarda el secreto en `STRIPE_WEBHOOK_SECRET`. Con `SUPABASE_SERVICE_ROLE_KEY`
+   y la migración `supabase/migrations/0002_purchases.sql`, cada compra queda registrada en la tabla `purchases`.
+
+Flujo: `POST /api/checkout` crea la sesión de Stripe Checkout → el usuario paga → vuelve a
+`/editor?checkout=success&session_id=…` → `GET /api/checkout/verify` comprueba el pago y se activa la compra.
+Sin `STRIPE_SECRET_KEY` el botón muestra «pagos no configurados»; en la vista previa estática la compra se simula.
+
+> Importante: ahora la compra activada se guarda en el navegador. Antes de lanzar, vincula las compras a la cuenta
+> del usuario (Supabase Auth + tabla `purchases`) y comprueba el derecho en el servidor al publicar o descargar.

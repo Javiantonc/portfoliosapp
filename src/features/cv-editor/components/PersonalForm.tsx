@@ -9,6 +9,7 @@ import { useCVStore, useSector } from '@/lib/store/cv-store'
 import { uid } from '@/lib/utils'
 import { Button, IconButton, TextArea, TextField } from '@/components/ui'
 import { PhotoUpload } from './PhotoUpload'
+import { PhotoOptions } from './PhotoOptions'
 import { SectionHeader } from './ListItem'
 
 export function PersonalForm() {
@@ -39,6 +40,8 @@ export function PersonalForm() {
         name="photoUrl"
         render={({ field }) => <PhotoUpload value={field.value} name={watch('fullName')} onChange={field.onChange} />}
       />
+
+      <PhotoOptions />
 
       <div className="grid gap-4 @md:grid-cols-2">
         <TextField label="Nombre completo" autoComplete="name" placeholder="Lucía Ferrer" error={e.fullName?.message} {...register('fullName')} />

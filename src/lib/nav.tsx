@@ -2,6 +2,8 @@
 import { createContext, useContext, type ComponentType, type ReactNode } from 'react'
 import type { AskFn } from './assistant/types'
 import type { SendContactFn } from './contact/types'
+import type { ImportCvFn } from './import/types'
+import type { CheckoutFn } from './checkout/types'
 
 export type View = 'home' | 'editor' | 'cv' | 'portfolio'
 
@@ -15,6 +17,14 @@ type AppEnv = {
   ask?: AskFn
   /** envío del formulario de contacto del portfolio (opcional) */
   sendContact?: SendContactFn
+  /** lectura de un CV existente con IA (opcional) */
+  importCv?: ImportCvFn
+  /** pago de productos Premium (si falta, la compra se simula) */
+  checkout?: CheckoutFn
+  /** navegación por código */
+  navigate?: (to: View) => void
+  /** ruta base de los archivos públicos (worker de PDF) */
+  assetBase?: string
 }
 
 const fallbackLink = ({ to, ...rest }: AppLinkProps) => <a href={`#${to}`} {...rest} />

@@ -19,11 +19,12 @@ export default function PortfolioCanvas({ data, mode = 'portfolio', className = 
   const style = useResolvedStyle(data)
   const theme = style.theme
   const reduce = useReducedMotion()
+  const small = typeof window !== 'undefined' && window.innerWidth < 768
   const base = data.settings.effects ?? defaultEffects
   const fx = reduce ? { ...base, speed: Math.min(base.speed, 0.2), float: false } : base
   return (
     <div className={`relative h-full w-full ${className}`} style={{ ...styleVars(style), background: theme.bg }}>
-      <Canvas camera={{ position: [0, 0, 9], fov: 40 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: false }}>
+      <Canvas camera={{ position: [0, 0, 9], fov: 40 }} dpr={[1, small ? 1.5 : 1.75]} performance={{ min: 0.5 }} gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}>
         <StageThemeProvider value={{ ...theme, titleScale: style.titleScale, fx }}>
           <color attach="background" args={[theme.bg]} />
           <fog attach="fog" args={[theme.bg, 9, 22]} />

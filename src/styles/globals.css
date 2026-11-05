@@ -145,3 +145,28 @@ input[type="range"].level::-moz-range-thumb {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* Móvil: iOS amplía la página al enfocar campos de menos de 16px */
+@media (max-width: 639px) {
+  input:not([type="range"]):not([type="checkbox"]):not([type="color"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
